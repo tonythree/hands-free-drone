@@ -1,8 +1,7 @@
 # hands-free-drone
-This project is part of Saturdays AI Barcelona 2020 Spring
+This project is part of Saturdays AI Barcelona 2020 Spring Edition
 
-## Team members
-Albert Montserrat, Asma Bensalah, Eva Deltor, Ali Abdul, Antonio Tripiana
+Team members: Albert Montserrat, Asma Bensalah, Eva Deltor, Ali Abdul, Antonio Tripiana
 
 ## Useful info
 OPEN BCI - Ganglion Getting Started Guide https://docs.openbci.com/docs/01GettingStarted/01-Boards/GanglionGS
