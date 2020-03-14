@@ -2,4 +2,4 @@
 
 ![head-sensors](img/head-sensors.jpg)
 
-![sensors-test](img/IMG_4755.HEIC)
+![sensors-test](img/IMG_4755.jpg)
