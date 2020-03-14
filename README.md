@@ -8,6 +8,8 @@ OPEN BCI - Ganglion Getting Started Guide https://docs.openbci.com/docs/01Gettin
 
 OPEN BCI - EEG Getting Started Guide https://github.com/OpenBCI/Docs/blob/master/Tutorials/02-Ganglion_Getting%20Started_Guide.md
 
+HOW TO CLEAN EEG ELECTRODES https://www.wikihow.com/Clean-EEG-Electrodes
+
 ![head-sensors](img/head-sensors.jpg)
 
 ![sensors-test](img/IMG_4755.jpg)
