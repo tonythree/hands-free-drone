@@ -1,6 +1,0 @@
-asdfasdfasdf
-function(): blablbalba
-Put code in local
-
-def function():
-  return blabblabla
