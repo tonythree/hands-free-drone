@@ -13,5 +13,3 @@ HOW TO CLEAN EEG ELECTRODES https://www.wikihow.com/Clean-EEG-Electrodes
 ![head-sensors](img/head-sensors.jpg)
 
 ![sensors-test](img/IMG_4755.jpg)
-
-Barcelona 2020
