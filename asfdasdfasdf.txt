@@ -1,3 +1,6 @@
 asdfasdfasdf
 
 Put code in local
+
+def function():
+  return blabblabla
