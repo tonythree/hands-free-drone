@@ -1,3 +1,12 @@
+
+import torch
+import torch.nn as nn
+import numpy as np
+
+import torch.nn.functional as F
+
+
+
 class ConvNet(nn.Module):
     def __init__(self):
         super(ConvNet,self).__init__()
@@ -13,10 +22,10 @@ class ConvNet(nn.Module):
         
       
         
-        conv1_f=nn.Conv1d(1,  64,  kernel_size=400, stride=50,padding=1)
-        self.conv2_f=nn.Conv1d(64, 128, kernel_size=6,   stride=1,padding=1)
-        self.conv3_f=nn.Conv1d(128,128, kernel_size=6,   stride=1,padding=1)
-        conv4_f=nn.Conv1d(128,128, kernel_size=6,   stride=1,padding=1)
+        conv1_f=nn.Conv1d(1,64,kernel_size=400, stride=50,padding=1)
+        self.conv2_f=nn.Conv1d(64, 128, kernel_size=6,stride=1,padding=1)
+        self.conv3_f=nn.Conv1d(128,128, kernel_size=6,stride=1,padding=1)
+        conv4_f=nn.Conv1d(128,128, kernel_size=6,stride=1,padding=1)
         
         
        
