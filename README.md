@@ -35,3 +35,7 @@ export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
 ```
 
 if you're using oh-my-zsh, edit ~/.zshrc and put this export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES at the beginning of file.
+
+## EEG API
+
+Running the ganglion board on macOS: `python read.py --board-id 1 --serial-port /dev/cu.usbmodem11 --log`
