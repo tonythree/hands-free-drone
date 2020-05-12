@@ -10,6 +10,8 @@ from multiprocessing import Process
 S = 60
 # Frames per second of the pygame window display
 FPS = 25
+# Rotation degrees
+ROTATION_DEGREES = 30
 
 
 class DroneApi(object):
@@ -23,7 +25,9 @@ class DroneApi(object):
             - W and S: Up and down.
     """
 
-    def __init__(self):
+    def __init__(self, is_fake=False):
+
+        self.is_fake = is_fake
 
         # Init Tello object that interacts with the Tello drone
         self.tello = Tello(enable_exceptions = False)
@@ -36,29 +40,8 @@ class DroneApi(object):
         self.speed = 10
         self.should_stop = False
 
+        self.is_connected = False
         self.send_rc_control = False
-
-    def run(self):
-
-        if not self.tello.connect():
-            print("Tello not connected")
-            return
-
-        if not self.tello.set_speed(self.speed):
-            print("Not set speed to lowest possible")
-            return
-
-        # In case streaming is on. This happens when we quit this program without the escape key.
-        if not self.tello.streamoff():
-            print("Could not stop video stream")
-            return
-
-        if not self.tello.streamon():
-            print("Could not start video stream")
-            return
-
-        self.frame_read = self.tello.get_frame_read()
-        self.runPygame()
 
     def runPygame(self):
         # Init pygame
@@ -72,13 +55,13 @@ class DroneApi(object):
         pygame.time.set_timer(pygame.USEREVENT + 1, 50)
 
         while not self.should_stop:
-            if self.processPygame() == True:
-                break
+            self.processPygame()
             time.sleep(1 / FPS)
 
         # Call it always before finishing. To deallocate resources.
-        self.frame_read.stop()
-        self.tello.end()
+        if not self.is_fake:
+            self.frame_read.stop()
+            self.tello.end()
         pygame.quit()
 
     def processPygame(self):
@@ -86,31 +69,32 @@ class DroneApi(object):
             if event.type == pygame.USEREVENT + 1:
                 self.update()
             elif event.type == pygame.QUIT:
-                return True
+                self.should_stop  =True
+                return
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    return True
+                    self.should_stop = True
+                    return
                 else:
                     self.keydown(event.key)
             elif event.type == pygame.KEYUP:
                 self.keyup(event.key)
 
-        if self.frame_read.stopped:
+        if not self.is_fake and self.frame_read.stopped:
             self.frame_read.stop()
-            return True
+            self.should_stop = True
+            return
 
         #cv2.imshow("frame", self.frame_read.frame)
 
-        self.screen.fill([0, 0, 0])
-        frame = cv2.cvtColor(self.frame_read.frame, cv2.COLOR_BGR2RGB)
-        frame = np.rot90(frame)
-        frame = np.flipud(frame)
-        frame = pygame.surfarray.make_surface(frame)
-        self.screen.blit(frame, (0, 0))
-        pygame.display.update()
-
-        return False
-
+        if not self.is_fake:
+            self.screen.fill([0, 0, 0])
+            frame = cv2.cvtColor(self.frame_read.frame, cv2.COLOR_BGR2RGB)
+            frame = np.rot90(frame)
+            frame = np.flipud(frame)
+            frame = pygame.surfarray.make_surface(frame)
+            self.screen.blit(frame, (0, 0))
+            pygame.display.update()
 
     def keydown(self, key):
         """ Update velocities based on key pressed
@@ -148,15 +132,76 @@ class DroneApi(object):
         elif key == pygame.K_a or key == pygame.K_d:  # set zero yaw velocity
             self.yaw_velocity = 0
         elif key == pygame.K_t:  # takeoff
-            self.tello.takeoff()
-            self.send_rc_control = True
+            self.takeoff()
+            print(self.send_rc_control)
         elif key == pygame.K_l:  # land
-            self.tello.land()
-            self.send_rc_control = False
+            self.land()
 
     def update(self):
         """ Update routine. Send velocities to Tello."""
         if self.send_rc_control:
-            self.tello.send_rc_control(self.left_right_velocity, self.for_back_velocity, self.up_down_velocity,
-                                       self.yaw_velocity)
+            if not self.is_fake:
+                self.tello.send_rc_control(self.left_right_velocity, self.for_back_velocity, self.up_down_velocity,
+                                           self.yaw_velocity)
 
+    def connect(self):
+        if not self.is_fake:
+            if not self.tello.connect():
+                print("Tello not connected")
+                return
+
+            if not self.tello.set_speed(self.speed):
+                print("Not set speed to lowest possible")
+                return
+
+            # In case streaming is on. This happens when we quit this program without the escape key.
+            if not self.tello.streamoff():
+                print("Could not stop video stream")
+                return
+
+            if not self.tello.streamon():
+                print("Could not start video stream")
+                return
+
+            self.frame_read = self.tello.get_frame_read()
+        else:
+            print("Starting Drone API in fake mode...")
+
+        self.is_connected = True
+
+    def takeoff(self):
+        """ Take off """
+        if self.is_connected:
+            if not self.is_fake:
+                self.tello.takeoff()
+            else: 
+                print("Fake take off")
+        self.send_rc_control = True
+
+
+    def land(self):
+        """ Land """
+        print(self.send_rc_control)
+        if self.send_rc_control:
+            if not self.is_fake:
+                self.tello.land()
+            else: 
+                print("Fake land")
+        self.send_rc_control = False
+
+    def right(self):
+        """ Turn X degrees right """
+        print(self.send_rc_control)
+        if self.send_rc_control:
+            if not self.is_fake:
+                self.tello.rotate_clockwise(ROTATION_DEGREES)
+            else: 
+                print("Fake turn right")
+
+    def left(self):
+        """ Turn X degrees right """
+        if self.send_rc_control:
+            if not self.is_fake:
+                self.tello.rotate_counter_clockwise(ROTATION_DEGREES)
+            else: 
+                print("Fake turn left")
