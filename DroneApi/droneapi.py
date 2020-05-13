@@ -12,6 +12,8 @@ S = 60
 FPS = 25
 # Rotation degrees
 ROTATION_DEGREES = 30
+# Vertical movement
+VERTICAL_MOVEMENT = 20
 
 
 class DroneApi(object):
@@ -133,7 +135,6 @@ class DroneApi(object):
             self.yaw_velocity = 0
         elif key == pygame.K_t:  # takeoff
             self.takeoff()
-            print(self.send_rc_control)
         elif key == pygame.K_l:  # land
             self.land()
 
@@ -148,26 +149,27 @@ class DroneApi(object):
         if not self.is_fake:
             if not self.tello.connect():
                 print("Tello not connected")
-                return
+                return False
 
             if not self.tello.set_speed(self.speed):
                 print("Not set speed to lowest possible")
-                return
+                return False
 
             # In case streaming is on. This happens when we quit this program without the escape key.
             if not self.tello.streamoff():
                 print("Could not stop video stream")
-                return
+                return False
 
             if not self.tello.streamon():
                 print("Could not start video stream")
-                return
+                return False
 
             self.frame_read = self.tello.get_frame_read()
         else:
             print("Starting Drone API in fake mode...")
 
         self.is_connected = True
+        return True
 
     def takeoff(self):
         """ Take off """
@@ -181,7 +183,6 @@ class DroneApi(object):
 
     def land(self):
         """ Land """
-        print(self.send_rc_control)
         if self.send_rc_control:
             if not self.is_fake:
                 self.tello.land()
@@ -191,7 +192,6 @@ class DroneApi(object):
 
     def right(self):
         """ Turn X degrees right """
-        print(self.send_rc_control)
         if self.send_rc_control:
             if not self.is_fake:
                 self.tello.rotate_clockwise(ROTATION_DEGREES)
@@ -205,3 +205,20 @@ class DroneApi(object):
                 self.tello.rotate_counter_clockwise(ROTATION_DEGREES)
             else: 
                 print("Fake turn left")
+
+    def up(self):
+        """ Move up X cm """
+        if self.send_rc_control:
+            if not self.is_fake:
+                self.tello.move_up(VERTICAL_MOVEMENT)
+            else: 
+                print("Fake move up")
+
+    def down(self):
+        """ Move down X cm """
+        if self.send_rc_control:
+            if not self.is_fake:
+                self.tello.move_down(VERTICAL_MOVEMENT)
+            else: 
+                print("Fake move down")
+
