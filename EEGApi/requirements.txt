@@ -70,8 +70,10 @@ tables==3.6.1
 terminaltables==3.1.0
 threadpoolctl==2.0.0
 timeflux==0.5.3
+timeflux-brainflow==0.2.0
 timeflux-dsp==0.1.0
 timeflux-example==0.1.1.dev2
+timeflux-openbci==0.2.0
 timeflux-ui==0.2.0
 typing-extensions==3.7.4.2
 urllib3==1.25.9
