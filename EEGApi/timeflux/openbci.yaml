@@ -15,18 +15,25 @@ graphs:
         board: ganglion
         serial_port: /dev/cu.usbmodem11
         debug: false
-    - id: display
-      module: timeflux.nodes.debug
-      class: Display
-    - id: pub
+    - id: bandpass
+      module: timeflux_dsp.nodes.filters
+      class: IIRFilter
+      params:
+        rate: 250
+        order: 3
+        frequencies: [1, 40]
+    - id: pub_openbci
       module: timeflux.nodes.zmq
       class: Pub
       params:
         topic: openbci
     edges:
     - source: acquire
-      target: pub
+      target: bandpass
+    - source: bandpass
+      target: pub_openbci
     rate: 10
+
 
   - id: Monitor
     nodes:
@@ -35,19 +42,153 @@ graphs:
       class: Sub
       params:
         topics: [ openbci ]
-    - id: bandpass
-      module: timeflux_dsp.nodes.filters
-      class: IIRFilter
-      params:
-        rate: 250
-        order: 3
-        frequencies: [1, 40]
     - id: ui
       module: timeflux_ui.nodes.ui
       class: UI
     edges:
       - source: sub:openbci
-        target: bandpass
-      - source: bandpass
         target: ui:openbci
+      - source: sub:detector
+        target: ui:detector
+    rate: 10
+
+
+  # Channel 1 UP detector
+  - id: Out_up
+    nodes:
+    - id: sub
+      module: timeflux.nodes.zmq
+      class: Sub
+      params:
+        topics: [ openbci ]
+
+    - id: select
+      module: timeflux.nodes.query
+      class: LocQuery
+      params:
+        key: [ eeg_1 ]
+        axis: 1
+
+    - id: peaks
+      module: timeflux_dsp.nodes.peaks
+      class: LocalDetect
+      params:
+        delta: 100
+        tol: 0.5
+
+    - id: display
+      module: timeflux.nodes.debug
+      class: Display
+    edges:
+      - source: sub:openbci
+        target: select
+      - source: select
+        target: peaks
+      - source: peaks
+        target: display
+    rate: 10
+
+  # Channel 2 DOWN detector
+  - id: Out_down
+    nodes:
+    - id: sub
+      module: timeflux.nodes.zmq
+      class: Sub
+      params:
+        topics: [ openbci ]
+
+    - id: select
+      module: timeflux.nodes.query
+      class: LocQuery
+      params:
+        key: [ eeg_2 ]
+        axis: 1
+
+    - id: peaks
+      module: timeflux_dsp.nodes.peaks
+      class: LocalDetect
+      params:
+        delta: 100
+        tol: 0.5
+
+    - id: display
+      module: timeflux.nodes.debug
+      class: Display
+    edges:
+      - source: sub:openbci
+        target: select
+      - source: select
+        target: peaks
+      - source: peaks
+        target: display
+    rate: 10
+
+  # Channel 3 LEFT detector
+  - id: Out_left
+    nodes:
+    - id: sub
+      module: timeflux.nodes.zmq
+      class: Sub
+      params:
+        topics: [ openbci ]
+
+    - id: select
+      module: timeflux.nodes.query
+      class: LocQuery
+      params:
+        key: [ eeg_3 ]
+        axis: 1
+
+    - id: peaks
+      module: timeflux_dsp.nodes.peaks
+      class: LocalDetect
+      params:
+        delta: 100
+        tol: 0.5
+
+    - id: display
+      module: timeflux.nodes.debug
+      class: Display
+    edges:
+      - source: sub:openbci
+        target: select
+      - source: select
+        target: peaks
+      - source: peaks
+        target: display
+    rate: 10
+
+  # Channel 4 RIGHT detector
+  - id: Out_right
+    nodes:
+    - id: sub
+      module: timeflux.nodes.zmq
+      class: Sub
+      params:
+        topics: [ openbci ]
+
+    - id: select
+      module: timeflux.nodes.query
+      class: LocQuery
+      params:
+        key: [ eeg_4 ]
+        axis: 1
+
+    - id: peaks
+      module: timeflux_dsp.nodes.peaks
+      class: LocalDetect
+      params:
+        delta: 100
+        tol: 0.5
+
+    - id: display
+      module: timeflux.nodes.debug
+      class: Display
+    edges:
+      - source: sub:openbci
+        target: select
+      - source: select
+        target: peaks
+      - source: peaks
+        target: display
     rate: 10
