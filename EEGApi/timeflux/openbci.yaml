@@ -15,17 +15,47 @@ graphs:
         board: ganglion
         serial_port: /dev/cu.usbmodem11
         debug: false
-    - id: display
-      module: timeflux.nodes.debug
-      class: Display
-    - id: pub
+
+    - id: bandpass
+      module: timeflux_dsp.nodes.filters
+      class: IIRFilter
+      params:
+        rate: 250
+        order: 3
+        frequencies: [1, 40]
+
+    # - id: display
+    #   module: timeflux.nodes.debug
+    #   class: Display
+
+    - id: pub_openbci
       module: timeflux.nodes.zmq
       class: Pub
       params:
         topic: openbci
+
+    - id: peaks
+      module: timeflux_dsp.nodes.peaks
+      class: LocalDetect
+      params:
+        delta: 0.1
+        tol: 0.5
+
+    - id: pub_detector
+      module: timeflux.nodes.zmq
+      class: Pub
+      params:
+        topic: detector
+
     edges:
     - source: acquire
-      target: pub
+      target: bandpass
+    - source: bandpass
+      target: pub_openbci
+    - source: bandpass
+      target: peaks
+    - source: peaks
+      target: pub_detector
     rate: 10
 
   - id: Monitor
@@ -34,20 +64,13 @@ graphs:
       module: timeflux.nodes.zmq
       class: Sub
       params:
-        topics: [ openbci ]
-    - id: bandpass
-      module: timeflux_dsp.nodes.filters
-      class: IIRFilter
-      params:
-        rate: 250
-        order: 3
-        frequencies: [1, 40]
+        topics: [ openbci, detector ]
     - id: ui
       module: timeflux_ui.nodes.ui
       class: UI
     edges:
       - source: sub:openbci
-        target: bandpass
-      - source: bandpass
         target: ui:openbci
+      - source: sub:detector
+        target: ui:detector
     rate: 10
