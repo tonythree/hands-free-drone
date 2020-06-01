@@ -11,6 +11,7 @@ def index():
 
 @socketio.on('my event')
 def test_message(message):
+    print(message)
     emit('my response', {'data': 'got it!'})
 
 if __name__ == '__main__':
