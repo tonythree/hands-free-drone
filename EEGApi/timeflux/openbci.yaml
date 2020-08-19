@@ -34,7 +34,6 @@ graphs:
       target: pub_openbci
     rate: 10
 
-
   - id: Monitor
     nodes:
     - id: sub
