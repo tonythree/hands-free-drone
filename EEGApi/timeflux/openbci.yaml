@@ -27,11 +27,19 @@ graphs:
       class: Pub
       params:
         topic: openbci
+    # Send to an external application
+    - id: OSC
+      module: timeflux.nodes.osc
+      class: Client
+      params:
+        address: /alpha
     edges:
     - source: acquire
       target: bandpass
     - source: bandpass
       target: pub_openbci
+    - source: bandpass
+      target: OSC
     rate: 10
 
   - id: Monitor
