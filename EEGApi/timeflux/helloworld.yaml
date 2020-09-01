@@ -1,0 +1,37 @@
+graphs:
+  - id: MyFirstGraph
+    nodes:
+    - id: random
+      module: timeflux.nodes.random
+      class: Random
+      params:
+        columns: 6
+        rows_min: 1
+        rows_max: 10
+        value_min: 0
+        value_max: 5
+        seed: 1
+    - id: add
+      module: timeflux_example.nodes.arithmetic
+      class: Add
+      params:
+        value: 1
+    # Send to an external application
+    - id: OSC
+      module: timeflux.nodes.osc
+      class: Client
+      params:
+        ip: 127.0.0.1
+        port: 5005
+        address: /eeg
+    - id: display
+      module: timeflux.nodes.debug
+      class: Display
+    edges:
+    - source: random
+      target: add
+    - source: add
+      target: display
+    - source: add
+      target: OSC
+    rate: 1

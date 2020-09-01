@@ -9,6 +9,9 @@ import math
 from pythonosc import dispatcher
 from pythonosc import osc_server
 
+def print_eeg_data(unused_addr, timestamp, ch1, ch2, ch3, ch4, ch5):
+  print(timestamp, ch1, ch2, ch3, ch4, ch5)
+
 def print_volume_handler(unused_addr, args, volume):
   print("[{0}] ~ {1}".format(args[0], volume))
 
@@ -29,6 +32,7 @@ if __name__ == "__main__":
   dispatcher.map("/filter", print)
   dispatcher.map("/volume", print_volume_handler, "Volume")
   dispatcher.map("/logvolume", print_compute_handler, "Log volume", math.log)
+  dispatcher.map("/eeg", print_eeg_data)
 
   server = osc_server.ThreadingOSCUDPServer(
       (args.ip, args.port), dispatcher)
